@@ -1,0 +1,5 @@
+# Model configurations
+arch: convnext_tiny           # options: customcnn, convnext_tiny, vit, fasterrcnn_backbone
+pretrained: True              # use pretrained weights if supported
+num_classes: 10               # number of classes (will be overwritten dynamically by dataset)
+freeze_backbone: False        # freeze backbone layers for transfer learning

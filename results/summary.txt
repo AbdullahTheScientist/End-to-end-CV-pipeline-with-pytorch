@@ -1,0 +1,19 @@
+Training Summary
+==================================================
+
+Best Validation Accuracy: 0.2606
+
+Per-Epoch Results:
+--------------------------------------------------
+
+Epoch 1:
+  Train Loss: 2.0779
+  Val Accuracy: 0.2606
+
+==================================================
+Best Model Metrics:
+--------------------------------------------------
+Accuracy: 0.2606
+Macro Precision: 0.2456
+Macro Recall: 0.2606
+Macro F1-Score: 0.2364
