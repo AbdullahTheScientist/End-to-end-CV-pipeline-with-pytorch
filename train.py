@@ -6,8 +6,10 @@ from datasets import make_dataloaders
 from models import make_model
 from utils.seed import set_seed
 from eval import evaluate
+from config_loader import load_configs, print_config
 import os
 from pathlib import Path
+import pandas as pd
 
 def train(config):
     set_seed(config.get("seed", 42))
@@ -122,23 +124,56 @@ def train(config):
                 f.write(f"Macro Recall: {macro[1]:.4f}\n")
                 f.write(f"Macro F1-Score: {macro[2]:.4f}\n")
 
-if __name__ == "__main__":
-    config = {
-        "arch": "tinycnn",
-        "dataset": "cifar10",
-        "epochs": 1,
-        "batch_size": 4,
-        "lr": 1e-3,
-        "use_amp": False,
-        "use_scheduler": False,
-        "use_grad_clip": False,
-        "weight_decay": 0.0,
-        "freeze_backbone": False,
-        "pretrained": False,
-        "seed": 42,
-        "max_batches": 3,
-        "fast_dev_run": True,
-        "results_dir": "results"
-    }
+    # -----------------------------
+    # Part 1: write experiment-level summary to part_1_results
+    # -----------------------------
+    part1_dir = Path("part_1_results")
+    part1_dir.mkdir(exist_ok=True)
 
+    # Load best model for final evaluation (if exists)
+    best_ckpt = os.path.join(results_dir, "best_model.pt")
+    if os.path.exists(best_ckpt):
+        eval_model = make_model(
+            arch=config["arch"],
+            num_classes=num_classes,
+            pretrained=config.get("pretrained", False),
+            freeze_backbone=config.get("freeze_backbone", False)
+        )
+        eval_model.load_state_dict(torch.load(best_ckpt, map_location=device))
+        eval_model.to(device)
+
+        cm_path = part1_dir / f"cn_{config['arch']}_{config['dataset']}.png"
+        final_metrics = evaluate(eval_model, val_loader, device=device, save_path=str(cm_path))
+
+        # Build summary text
+        summary_file = part1_dir / "summary.txt"
+        with open(summary_file, "a") as sf:
+            sf.write(f"Experiment: {config['arch']} | Dataset: {config['dataset']}\n")
+
+            # per-class table
+            per_class_df = final_metrics["per_class"]
+            per_class_df.index.name = "class"
+            sf.write(per_class_df.to_string())
+            sf.write("\n\n")
+
+            # global aggregates
+            global_df = final_metrics["global"]
+            sf.write(global_df.to_string())
+            sf.write("\n\n")
+
+        print(f"Part 1: summary appended to {summary_file} and confusion matrix saved to {cm_path}")
+    else:
+        print(f"No best checkpoint found at {best_ckpt}; skipping part_1 summary append.")
+
+if __name__ == "__main__":
+    # Load configuration from YAML files
+    config = load_configs(
+        model_config_path="configs/model.yaml",
+        train_config_path="configs/train.yaml"
+    )
+    
+    # Print loaded configuration
+    print_config(config)
+    
+    # Start training
     train(config)

@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+
 .Python
 build/
 develop-eggs/
@@ -143,6 +144,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Data folders
+data/
 
 # Spyder project settings
 .spyderproject

@@ -1,7 +1,7 @@
 import torch
 from models import make_model
 
-def export_onnx(model, input_shape=(1,3,32,32), file_path="model.onnx"):
+def export_onnx(model, input_shape=(1,3,224,224), file_path="model.onnx"):
     """Export a loaded model to ONNX format"""
     dummy_input = torch.randn(*input_shape)
     torch.onnx.export(

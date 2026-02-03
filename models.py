@@ -10,16 +10,17 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn
 class TinyCNN(nn.Module):
     def __init__(self, num_classes=10):
         super().__init__()
-        self.net = nn.Sequential(
+        self.backbone = nn.Sequential(
             nn.Conv2d(3, 8, 3, padding=1),
             nn.ReLU(),
             nn.AdaptiveAvgPool2d(1),  # works for any image size
             nn.Flatten(),
-            nn.Linear(8, num_classes)
         )
+        self.classifier = nn.Linear(8, num_classes)
 
     def forward(self, x):
-        return self.net(x)
+        x = self.backbone(x)
+        return self.classifier(x)
 
 
 # -----------------------------
@@ -28,7 +29,7 @@ class TinyCNN(nn.Module):
 class CustomCNN(nn.Module):
     def __init__(self, num_classes=10):
         super().__init__()
-        self.features = nn.Sequential(
+        self.backbone = nn.Sequential(
             nn.Conv2d(3, 32, 3, padding=1), nn.ReLU(),
             nn.MaxPool2d(2),               # 32x32 -> 16x16
             nn.Conv2d(32, 64, 3, padding=1), nn.ReLU(),
@@ -37,7 +38,7 @@ class CustomCNN(nn.Module):
         self.classifier = nn.Linear(64 * 8 * 8, num_classes)
 
     def forward(self, x):
-        x = self.features(x)
+        x = self.backbone(x)
         x = torch.flatten(x, 1)
         return self.classifier(x)
 
