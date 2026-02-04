@@ -42,7 +42,6 @@ This project demonstrates an end-to-end workflow for image classification:
 ├── part_2_results/         # Part 2 outputs (ONNX variants, comparison)
 ├── utils/
 │   ├── metrics.py          # Metrics computation (sklearn-based)
-│   ├── preprocessing.py    # Data preprocessing utilities
 │   └── seed.py             # Reproducibility utilities
 ├── config_loader.py        # YAML configuration loader
 ├── datasets.py             # DataLoader factory
